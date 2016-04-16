@@ -1,0 +1,162 @@
+---
+title: "¿Que hace a un corredor rápido?"
+author: "Pablo León"
+date: "April 13, 2016"
+output: html_document
+---
+
+Esta es una pregunta que preocupa, en mayor o menor medida, a todos aquellos que corren. 
+
+Y para la que no faltan respuestas, todos los runners tienen sus propias teorías y convicciones,
+y también están los sitios web, blogs y revistas que dan sus recomendaciones.
+
+Como a mi también me interesa la pregunta (en sus variante ¿y como hizo toda esa gente para llegar antes que yó a 
+la meta?) me propuse investigar el tema.
+
+Voy a partir con lo más simple, tomar una carrera y comparar a los corredores según categoría de edad y género (sexo).
+
+La carrera
+-----------
+Los resultados son los de la carrera [Brooks #50](http://metachip.cl/?op=4&evento=243) de Vitacura ([segmento strava](https://www.strava.com/segments/1325221)). Es una carrera 10K (aproximadamente 9.85 km).
+
+
+```{r echo=FALSE}
+library(ggplot2)
+library(knitr)
+#
+# Functions
+#
+Time2Mins <- function(s) {
+  v <- strsplit(s, ":")
+  n <- length(v[[1]])
+  m <- 0
+  for (i in 1:n) {
+    k=as.numeric(v[[1]][n])
+    m <- (m*60) + (as.numeric(v[[1]][i]))
+  }
+  return(m/60)
+}
+```
+
+```{r cache=TRUE, echo=FALSE}
+if (exists("dfBrooks50")) {
+  message("Skiping file Read.")
+} else {
+  dfBrooks50 <- read.csv2("Brooks50.csv")
+}
+```
+
+
+```{r echo=FALSE}
+df <- dfBrooks50[c(1,5:11)]
+df$mins=sapply(as.character(df$T.Chip), Time2Mins) 
+levels(df$Sexo)[levels(df$Sexo)=="f"] <- "F"
+levels(df$Sexo)[levels(df$Sexo)=="m"] <- "M"
+
+nRunners=length(df$Numero)
+```
+
+La carrera se corrió el 13 de Marzo del 2016, y tenemos resultados de `r nRunners` corredores.
+
+Los tiempos obtenidos (en minutos) se resumen de la siguiente forma:
+```{r echo=FALSE}
+summary(df$mins)
+```
+
+Por género
+-----------
+
+La cantidad de corredores por género es:
+```{r echo=FALSE}
+summary(df$Sexo)
+```
+
+Y los resultados son:
+```{r echo=FALSE}
+tapply(df$mins, df$Sexo, summary)
+```
+o dicho de otra forma:
+```{r fig.heigth=6, echo=FALSE}
+psex <- ggplot(df, aes(Sexo, mins)) +
+  geom_boxplot() +
+  geom_jitter(aes(color=Sexo), alpha=0.2)  
+psex
+```
+
+Mh ... , hay tanto hombres como mujeres entre los más rápidos, y lo mismo en los más lentos.
+
+Y sí, como era de esperar, en general los hombres son más rápidos que las mujeres.
+
+Por edad
+---------
+
+Los resultados por categoría se dividen así:
+```{r echo=FALSE}
+s <-summary(df$Categoria)
+dfCat <- data.frame(Categoria=names(s), Cant=s, row.names=NULL)
+kable(dfCat)
+#tapply(df$Categoria, df$Sexo, summary)
+#tapply(df$mins, df$Categoria, summary)
+```
+
+
+Y se ven así:
+
+```{r fig.heigth=6, echo=FALSE}
+pcat2 <- ggplot(df, aes(Categoria, mins)) +
+  geom_boxplot() +
+  geom_jitter(aes(color=Sexo), alpha=0.2)  
+pcat2
+```
+
+
+Ups, sorpresa. Todas las categorias entre 15 y 65 años tienen una media muy parecida.
+
+#### ¡¿Quiere decir que no hay edad para correr?!
+
+No exactamente, dandole un poco más de vueltas al asunto me encontré con algo cuando se separan los resultados de hombres y mujeres:
+
+```{r fig.heigth=6, echo=FALSE}
+pcat3 <- ggplot(df, aes(Categoria, mins)) +
+  geom_boxplot() +
+  geom_jitter(aes(color=Sexo), alpha=0.2)  +
+  facet_grid(Sexo~.) 
+pcat3
+```
+
+
+En los hombres la media aumenta con cada cambio de categoría.
+Es decir que a más joven, más rápido. Y el cambio parece bastante lineal, sin _plateaus_.
+
+Lo que pasa en las mujeres es extraño. La categoría más rápida es la de "46 - 55 años".
+Y se forma una especie de valle alrededor de esa categoría.
+
+#### ¿¿¿???
+
+Quizás esto ayude a entender:
+
+```{r fig.heigth=6, echo=FALSE}
+x <- tapply(df$Categoria, df$Sexo, summary)
+df2F <- data.frame(Categoria=labels(x[["F"]]), Sexo="F", Cant=x[["F"]], row.names=NULL)
+df2M <- data.frame(Categoria=labels(x[["M"]]), Sexo="M", Cant=x[["M"]], row.names=NULL)
+df2 <- rbind(df2F,df2M)
+
+
+plotSexNumbers <-ggplot(data=df2, aes(x=Categoria, y=Cant, fill=Sexo)) +
+    geom_bar(stat="identity", position="dodge")
+plotSexNumbers
+```
+    
+
+En la categoría de "15 - 26 años" la cantidad de mujeres es mayor que la de hombres!
+Pero de ahí en adelante la cantidad relativa a la de hombres baja con cada categoría.
+
+Puede ser que en las siguientes categorías solo quedan compitiendo las corredoras más fuertes,
+y por eso su media baje en el tiempo.
+
+### Conclusión
+
+¡Me toca correr hoy, mañana seré más lento !
+
+
+
