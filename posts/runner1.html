@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Pablo León" />
+
+<meta name="date" content="2016-04-13" />
+
+<title>¿Que hace a un corredor rápido?</title>
+
+<script src="runner1_files/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="runner1_files/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="runner1_files/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="runner1_files/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="runner1_files/bootstrap-3.3.5/shim/respond.min.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<link rel="stylesheet"
+      href="runner1_files/highlight/default.css"
+      type="text/css" />
+<script src="runner1_files/highlight/highlight.js"></script>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs && document.readyState && document.readyState === "complete") {
+   window.setTimeout(function() {
+      hljs.initHighlighting();
+   }, 0);
+}
+</script>
+
+
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script src="runner1_files/navigation-1.0/tabsets.js"></script>
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+
+
+<div class="fluid-row" id="header">
+
+
+<h1 class="title">¿Que hace a un corredor rápido?</h1>
+<h4 class="author"><em>Pablo León</em></h4>
+<h4 class="date"><em>April 13, 2016</em></h4>
+
+</div>
+
+
+<p>Esta es una pregunta que preocupa, en mayor o menor medida, a todos aquellos que corren.</p>
+<p>Y para la que no faltan respuestas, todos los runners tienen sus propias teorías y convicciones, y también están los sitios web, blogs y revistas que dan sus recomendaciones.</p>
+<p>Como a mi también me interesa la pregunta (en sus variante ¿y como hizo toda esa gente para llegar antes que yó a la meta?) me propuse investigar el tema.</p>
+<p>Voy a partir con lo más simple, tomar una carrera y comparar a los corredores según categoría de edad y género (sexo).</p>
+<div id="la-carrera" class="section level2">
+<h2>La carrera</h2>
+<p>Los resultados son los de la carrera <a href="http://metachip.cl/?op=4&amp;evento=243">Brooks #50</a> de Vitacura (<a href="https://www.strava.com/segments/1325221">segmento strava</a>). Es una carrera 10K (aproximadamente 9.85 km).</p>
+<p>La carrera se corrió el 13 de Marzo del 2016, y tenemos resultados de 2322 corredores.</p>
+<p>Los tiempos obtenidos (en minutos) se resumen de la siguiente forma:</p>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   31.15   51.07   58.32   59.26   66.91   93.65</code></pre>
+</div>
+<div id="por-genero" class="section level2">
+<h2>Por género</h2>
+<p>La cantidad de corredores por género es:</p>
+<pre><code>##    F    M 
+##  977 1345</code></pre>
+<p>Y los resultados son:</p>
+<pre><code>## $F
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   36.08   57.88   64.93   65.29   72.17   93.65 
+## 
+## $M
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   31.15   48.13   54.07   54.89   60.68   93.32</code></pre>
+<p>o dicho de otra forma: <img src="runner1_files/figure-html/unnamed-chunk-7-1.png" title="" alt="" width="672" /></p>
+<p>Mh … , hay tanto hombres como mujeres entre los más rápidos, y lo mismo en los más lentos.</p>
+<p>Y sí, como era de esperar, en general los hombres son más rápidos que las mujeres.</p>
+</div>
+<div id="por-edad" class="section level2">
+<h2>Por edad</h2>
+<p>Los resultados por categoría se dividen así:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Categoria</th>
+<th align="right">Cant</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">15 - 25 AÑOS</td>
+<td align="right">312</td>
+</tr>
+<tr class="even">
+<td align="left">26 - 35 AÑOS</td>
+<td align="right">921</td>
+</tr>
+<tr class="odd">
+<td align="left">36 - 45 AÑOS</td>
+<td align="right">676</td>
+</tr>
+<tr class="even">
+<td align="left">46 - 55 AÑOS</td>
+<td align="right">297</td>
+</tr>
+<tr class="odd">
+<td align="left">56 - 65 AÑOS</td>
+<td align="right">91</td>
+</tr>
+<tr class="even">
+<td align="left">66 A 70 AÑOS</td>
+<td align="right">20</td>
+</tr>
+<tr class="odd">
+<td align="left">71 AÑOS Y +</td>
+<td align="right">5</td>
+</tr>
+</tbody>
+</table>
+<p>Y se ven así:</p>
+<p><img src="runner1_files/figure-html/unnamed-chunk-9-1.png" title="" alt="" width="672" /></p>
+<p>Ups, sorpresa. Todas las categorias entre 15 y 65 años tienen una media muy parecida.</p>
+<div id="quiere-decir-que-no-hay-edad-para-correr" class="section level4">
+<h4>¡¿Quiere decir que no hay edad para correr?!</h4>
+<p>No exactamente, dandole un poco más de vueltas al asunto me encontré con algo cuando se separan los resultados de hombres y mujeres:</p>
+<p><img src="runner1_files/figure-html/unnamed-chunk-10-1.png" title="" alt="" width="672" /></p>
+<p>En los hombres la media aumenta con cada cambio de categoría. Es decir que a más joven, más rápido. Y el cambio parece bastante lineal, sin <em>plateaus</em>.</p>
+<p>Lo que pasa en las mujeres es extraño. La categoría más rápida es la de “46 - 55 años”. Y se forma una especie de valle alrededor de esa categoría.</p>
+</div>
+<div id="section" class="section level4">
+<h4>¿¿¿???</h4>
+<p>Quizás esto ayude a entender:</p>
+<p><img src="runner1_files/figure-html/unnamed-chunk-11-1.png" title="" alt="" width="672" /></p>
+<p>En la categoría de “15 - 26 años” la cantidad de mujeres es mayor que la de hombres! Pero de ahí en adelante la cantidad relativa a la de hombres baja con cada categoría.</p>
+<p>Puede ser que en las siguientes categorías solo quedan compitiendo las corredoras más fuertes, y por eso su media baje en el tiempo.</p>
+</div>
+<div id="conclusion" class="section level3">
+<h3>Conclusión</h3>
+<p>¡Me toca correr hoy, mañana seré más lento !</p>
+</div>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+$(document).ready(function () {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+});
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
