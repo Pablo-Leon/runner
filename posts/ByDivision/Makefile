@@ -29,7 +29,7 @@ publish: runner1.pdf
 	git add $(PUBLISH_DIR)/$^
 
 .Rmd.html:	
-	Rscript -e "rmarkdown::render('$(RMDFILE).Rmd')"
+	Rscript -e "rmarkdown::render('$(RMDFILE).Rmd', clean=FALSE)"
 
 .Rmd.pdf:	
 	# pandoc +RTS -K64M -RTS -o $@  $<
@@ -37,6 +37,7 @@ publish: runner1.pdf
 
 clean:
 	-rm *.trc $(RMDFILE).html $(RMDFILE).pdf
+	-rm $(RMDFILE).knit.md $(RMDFILE).utf8.md 
 	-rm -r *_cache *_files
 
 clean-all: clean
