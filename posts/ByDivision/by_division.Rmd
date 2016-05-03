@@ -1,8 +1,10 @@
 ---
 title: "Velocidad según la edad"
-date: "May 2, 2016"
+date: "May 3, 2016"
 output: html_document
 ---
+
+_(fuentes y última versión [aquí](https://github.com/Pablo-Leon/runner/tree/master/posts/ByDivision))_
 
 En este post voy a revisar el cambio de los tiempos en función de la edad.
 
@@ -174,7 +176,7 @@ pvio <- ggplot(df10k, aes(Division, Speed, fill=Sex)) +
 pvio  
 ```
 
-Y la regresión lineal por edad dá los siguientes resultados:
+Y la regresión lineal por edad da los siguientes resultados:
 ```{r echo=FALSE}
 myLm10kMAgeMid <- function(sEvent) {
 	df <- df10k[df10k$Sex=="M",] 
@@ -219,7 +221,7 @@ pvio21k <- ggplot(df21k, aes(Division, Speed, fill=Sex)) +
 pvio21k  
 ```
 
-Y la regresión lineal por edad dá los siguientes resultados:
+Y la regresión lineal por edad da los siguientes resultados:
 ```{r echo=FALSE}
 myLm21kMAge <- function(sEvent) {
 	df <- df21k[df21k$Sex=="M",] 
@@ -235,7 +237,7 @@ Es llamativo que las velocidades medias son muy similares en las carreras de 10k
 La baja de velocidad con la edad es menos significativa en las carreras de 21k que de 10k, casi la mitad.
 
 ## Comentarios 
-Lo esperable era una baja en la velocidad con la edad. Y se dá en hombres en carreras de 10k y 21k. 
+Lo esperable era una baja en la velocidad con la edad. Y se da en hombres en carreras de 10k y 21k. 
 
 En las mujeres ocurre algo distinto, con las categorías de 35 a 55 años teniendo los mejores resultados.
 Eso requiere una explicación.
@@ -245,8 +247,8 @@ Por otra parte si observamos como cambian los máximos de cada categoría en los
 
 ### Impresión
 Tengo la impresión de que la reducción de la velocidad con la edad es mayor que la que indica la regresión. Y que el efecto de auto selección efecto significativo. 
-Es decir, en las catagorías mayores solo quedan los runners más dedicados, lo que sube su promedio, mientras que en los más jovenes participan más corredores con poca dedicación, que bajan el promedio.
-Separar esa influencia requerirírá otro análisis.
+Es decir, en las categorías mayores solo quedan los runners más dedicados, lo que sube su promedio, mientras que en los más jóvenes participan más corredores con poca dedicación, que bajan el promedio.
+Separar esa influencia requerirá otro análisis.
 
 
 [Brooks50]: <http://metachip.cl/?op=4&evento=243>
