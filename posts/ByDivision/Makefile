@@ -15,7 +15,7 @@ R_SOURCE_FILES=eda.R eda2.R
 SOURCE_FILES=Makefile $(PERL_SOURCE_FILES) \
 	$(R_SOURCE_FILES) $(RMDFILE).Rmd 
 
-.PHONY: all clean heads wdata chk bkp publish
+.PHONY: all clean heads wdata chk bkp
 .SUFFIXES:.Rmd .html
 
 
@@ -24,12 +24,13 @@ all: data $(RMDFILE).html
 hello:
 	echo "Hello!"
 
-publish: runner1.pdf
-	cp $^ $(PUBLISH_DIR)/.
-	git add $(PUBLISH_DIR)/$^
+# publish: runner1.pdf
+# 	cp $^ $(PUBLISH_DIR)/.
+# 	git add $(PUBLISH_DIR)/$^
 
+#	Rscript -e "rmarkdown::render('$(RMDFILE).Rmd', clean=FALSE)"
 .Rmd.html:	
-	Rscript -e "rmarkdown::render('$(RMDFILE).Rmd', clean=FALSE)"
+	Rscript -e "rmarkdown::render('$(RMDFILE).Rmd')"
 
 .Rmd.pdf:	
 	# pandoc +RTS -K64M -RTS -o $@  $<
