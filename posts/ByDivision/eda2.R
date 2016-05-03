@@ -64,45 +64,34 @@ if (exists("dfMds")) {
 	dfMds <- rbind(LoadMds(2014),LoadMds(2015),LoadMds(2016))
 	dfMds$event <- as.factor(dfMds$event)
 }
-df <- dfMds
 
-# rm("dfBrooks50")
-if (exists("dfBrooks50")) {
-  message("Skiping file Read.")
-} else {
-  dfBrooks50 <- read.csv2("Brooks50.csv")
-}
-# df <- dfBrooks50[c(1,5:11)]
-# df <- tbl_df(dfBrooks50)
 
 # print("--- Race (df):")
 # print(str(df))
 # print(head(df))
 
-# vs <- c("0", "1", "0:0", "0:3", "1:0", "1:1", "0:32:6", "1:07:23")
-# print (vs)
-# print (sapply(vs, Time2Mins))
-
 
 #
 # Process
 #
-df <- df[df$Sex == "M",]
+dfMds <- dfMds[dfMds$Sex == "M",]
 
 # Speed
 
 # Division
-df$AgeLo <- as.numeric( gsub("^(\\d+).*","\\1", df$Division) ) 
-df$AgeHi <- as.numeric( gsub("^\\d+-(\\d+)","\\1", df$Division) ) 
-df$AgeMid <- (df$AgeLo + df$AgeHi)/2
-df <- df[df$AgeLo < 70,]
+# df$AgeLo <- as.numeric( gsub("^(\\d+).*","\\1", df$Division) ) 
+# df$AgeHi <- as.numeric( gsub("^\\d+-(\\d+)","\\1", df$Division) ) 
+# df$AgeMid <- (df$AgeLo + df$AgeHi)/2
+# df <- df[df$AgeLo < 70,]
 
 
 #
 # Subsets
 #
-dfComplete <- df[df$interval == "complete",]
-df10k <- df[df$race == "10k",]
+dfComplete <- dfMds[dfMds$interval == "complete",]
+df10k <- dfComplete[dfComplete$race == "10k",]
+df21k <- dfComplete[dfComplete$race == "21k",]
+df42k <- dfComplete[dfComplete$race == "42k",]
 
 
 
@@ -110,6 +99,8 @@ df10k <- df[df$race == "10k",]
 print("### Summary dfMds ")
 print(summary(dfMds))
 print("--------------")
+print("#### dfMds, table by: race, interval, event")
+print(with(dfMds, table(race, interval, event)))
 print("#### dfMds, table by: race, interval, event ")
 print(table(dfMds$race, dfMds$interval, dfMds$event))
 print("")
@@ -124,20 +115,20 @@ print("")
 print(with(df10k, table(Sex, race, event)))
 print("table(df10k$event)")
 print(with(df10k, table(event)))
-tapply()
+
 
 #
 # Explore
 # 
-print(length(df$GunMins))
+print(length(df21k$GunMins))
 
-print(summary(df$Division))
+print(summary(df21k$Division))
 
-print(summary(df$Sex))
+print(summary(df21k$Sex))
 
-print(summary(df$GunMins))
+print(summary(df21k$GunMins))
 
-# qplot(data=df, mins)
+
 
 #
 # Plot histogram
@@ -176,8 +167,23 @@ median.quartile <- function(x){
 }
 
 #  geom_violin(scale="count") +
-pvio <- ggplot(df10k, aes(Division, Speed, fill=Sex)) +
+pvio10k <- ggplot(df10k, aes(Division, Speed, fill=Sex)) +
   coord_cartesian(ylim = c(3, 23)) + 
+  geom_violin() +
+  stat_summary(fun.y="mean", geom="point") +
+  geom_smooth(method = "lm", se=FALSE, color="black", aes(group=1)) +
+  facet_grid(event~.)
+
+
+pvio21k <- ggplot(df21k, aes(Division, Speed, fill=Sex)) +
+  coord_cartesian(ylim = c(3, 23)) + 
+  geom_violin() +
+  stat_summary(fun.y="mean", geom="point") +
+  geom_smooth(method = "lm", se=FALSE, color="black", aes(group=1)) +
+  facet_grid(event~.)
+
+pvio42k <- ggplot(df42k, aes(Division, Speed, fill=Sex)) +
+  coord_cartesian(ylim = c(5, 18)) + 
   geom_violin() +
   stat_summary(fun.y="mean", geom="point") +
   geom_smooth(method = "lm", se=FALSE, color="black", aes(group=1)) +
@@ -189,20 +195,31 @@ pvio <- ggplot(df10k, aes(Division, Speed, fill=Sex)) +
 #   geom_smooth(method = "lm", se=FALSE, color="black", aes(group=1)) +
 #   facet_grid(Sexo~.)
 
-
-myLm10kMAgeMid <- function(sEvent) {
+#
+# Regresion
+#
+events <- levels(dfComplete$event)
+myLm10kMAge <- function(sEvent) {
 	df <- df10k[df10k$Sex=="M",] 
 	lm(Speed ~ Age, data = df, subset=(event == sEvent))$coef
 }
+lm10k <- sapply(events, myLm10kMAge)
 
-events <- levels(df10k$event)
-myLm <- sapply(events, myLm10kMAgeMid)
 
-print( "myLm:")
-print( myLm)
+myLm21kMAge <- function(sEvent) {
+	df <- df21k[df21k$Sex=="M",] 
+	lm(Speed ~ Age, data = df, subset=(event == sEvent))$coef
+}
+lm21k <- sapply(events, myLm21kMAge)
 
-lm.speed_by_div.M = lm(Speed ~ AgeMid, data = df10k, subset=(Sex=="M"))
-# lm.speed_by_div.F = lm(Speed ~ AgeMid, data = df, subset=(Sex=="F"))
+
+print( "lm10k:")
+print(lm10k)
+print( "lm21k:")
+print(lm21k)
+
+lm.speed_by_div.M = lm(Speed ~ Age, data = df10k, subset=(Sex=="M"))
+
 
   
 

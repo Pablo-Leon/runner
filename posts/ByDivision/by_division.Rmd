@@ -1,22 +1,257 @@
 ---
-title: "By_Division"
-author: "Pablo León"
+title: "Velocidad según la edad"
 date: "May 2, 2016"
 output: html_document
 ---
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+En este post voy a revisar el cambio de los tiempos en función de la edad.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+Pero la variable a usar va a ser la velocidad, no el tiempo.
+El problema con los tiempos es que no son lineales.
 
-```{r}
-summary(cars)
+Por ejemplo esta es la relación entre los tiempos (en minutos) y la velocidad (km/h) en una carrera de 10km:
+```{r echo=FALSE}
+mins <- seq(30,90)
+kmh <- 10 / (mins/60)
+plot(x=mins, y=kmh)
 ```
 
-You can also embed plots, for example:
+Para tiempos mayores que 60 minutos es bastante lineal, pero para tiempos menores definitivamente nó.
 
-```{r, echo=FALSE}
-plot(cars)
+## Carrera Brooks 
+
+Los datos son de la carrera [Brooks #50] [Brooks50]
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+library(dplyr)
+library(ggplot2)
+# functions
+Time2Mins <- function(s) {
+  v <- strsplit(s, ":")
+  n <- length(v[[1]])
+  m <- 0
+  for (i in 1:n) {
+    k=as.numeric(v[[1]][n])
+    m <- (m*60) + (as.numeric(v[[1]][i]))
+  }
+  return(m/60)
+}
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+```{r cache=TRUE, echo=FALSE}
+# Load Data
+dfBrooks50 <- read.csv2("Brooks50.csv")
+#
+# Process
+#
+df <- dfBrooks50[c(1,5:11)]
+df$mins=sapply(as.character(df$T.Chip), Time2Mins) 
+levels(df$Sexo)[levels(df$Sexo)=="f"] <- "F"
+levels(df$Sexo)[levels(df$Sexo)=="m"] <- "M"
+
+# Speed
+df$speed=9.85/(df$mins/60)
+
+# Division
+df$Division <- gsub("(\\d+) A.*OS.*","\\1-..", 
+  gsub("(\\d+) A (\\d+) .*","\\1-\\2", 
+    gsub("(\\d+) - (\\d+) .*","\\1-\\2", df$Categoria) ))
+df$AgeLo <- as.numeric( gsub("^(\\d+).*","\\1", df$Categoria) ) 
+df$AgeHi <- as.numeric( gsub("(\\d+) A.*OS.*", "999",
+  gsub("^\\d+\\D+(\\d+).*","\\1", df$Categoria) ) )
+df$AgeMid <- (df$AgeLo + df$AgeHi)/2
+df <- df[df$AgeLo < 70,]
+
+
+# Summary
+#	filter(AgeLo < 70) %>%
+dfDiv <- df %>%
+  group_by(Division, Sexo)  %>%
+  summarise(AgeMid = mean(AgeMid), count=n(),
+  	speed.mn=mean(speed), speed.s=sd(speed),
+  	speed.mx=max(speed),  speed.p90=quantile(speed,0.9)) 
+
+```
+
+Los tiempos de esta carrera por género (Sexo) se ven aquí:
+
+```{r echo=FALSE}
+pvio2 <- ggplot(df, aes(factor(Division), speed, fill=Sexo)) +
+  geom_violin() +
+  stat_summary(fun.y="mean", geom="point") +
+  geom_smooth(method = "lm", se=FALSE, color="black", aes(group=1)) +
+  facet_grid(Sexo~.)
+pvio2
+```
+
+La linea de tendencia ayuda a ver que en los hombres la velocidad (en km/h),
+baja con la edad, que es lo esperado. Pero en las mujeres se aprecia una curva convexa, con valores altos en el rango 35-45 años.
+
+```{r echo=FALSE}
+lm.speed_by_div.M = lm(speed ~ AgeMid, data = df, subset=(Sexo=="M"))
+lm.speed_by_div.F = lm(speed ~ AgeMid, data = df, subset=(Sexo=="F"))
+m.M <- lm.speed_by_div.M$coef[["AgeMid"]]
+m.F <- lm.speed_by_div.F$coef[["AgeMid"]]
+```
+Los valores de la pendiente son:
+
+*  **`r sprintf("%0.3f",m.M)`** km/h por año para hombres, y
+*  **`r sprintf("%0.3f",m.F)`** km/h por año para mujeres
+
+La cantidad de corredores:
+```{r echo=FALSE}
+with(df, table(Sexo, Division))
+```
+
+Mi impresión es que con la edad solo las mujeres más comprometidas quedan compitiendo. Eso se refleja en que la cantidad de participantes baja más rápido que en los hombres con la edad. Y esa "depuración" de participantes produce mejores resultados en las categorías del medio.
+Pero eso será tema de otro artículo. 
+Así que en el resto solo usaré los datos de los hombres.
+
+## Otras carreras
+
+Las otra carreras revisadas son las ediciones de [2014] [mds2014], [2015] [mds2015] y [2016] [mds2016] de la Corrida de Santiago (simultánea con la Maratón de Santiago). Esta es una carrera de 10k.
+
+```{r echo=FALSE, cache=TRUE}
+BrooksDivision <- function(age) {
+	if (age > 70) "70-.." else {
+	r <- (age-6) %/% 10
+	if (r <= 1) "15-25" else 
+		if (r == 6) "66-70" else 
+			sprintf("%02d-%02d", r*10+6, r*10+15)
+	}
+}
+DistanceMds <- function(sRaceInterval) {
+	interval = sub("\\S+\\s:\\s(\\S+)", "\\1", sRaceInterval)
+	if (interval == "complete") {
+		sDist = sub("(\\S+)\\s:.*", "\\1", sRaceInterval)
+	} else {
+		sDist = interval
+	}
+	as.numeric( sub("(\\d+)[kK]", "\\1", sDist) )
+}
+LoadMds <- function(y) {
+	sFile=sprintf("mds%d.csv", y);
+	# race;interval;entryID;Rank;Name;Bib;GunTime;Pace;Hometown;Age;Sex;Division;DivRank;GunMins
+	df <- read.csv2(sFile)[,c(1:2,6,9:11,14)]
+	df <- df[df$Age < 70,]
+	df$event=sprintf("mds%d", y);
+	df$GunMins <- as.numeric(levels(df$GunMins))[df$GunMins]
+	df$Division <- as.factor(sapply(df$Age, BrooksDivision))
+	df$Dist <- sapply(paste(df$race, ":", df$interval ), DistanceMds)
+	df$Speed <- df$Dist / (df$GunMins/60)
+	df$Hometown <- as.factor(sub("^(\\S+), --", "\\1", df$Hometown))
+	df
+}
+dfMds <- rbind(LoadMds(2014),LoadMds(2015),LoadMds(2016))
+dfMds$event <- as.factor(dfMds$event)
+
+dfMds <- dfMds[dfMds$Sex == "M",]
+
+dfComplete <- dfMds[dfMds$interval == "complete",]
+df10k <- dfComplete[dfComplete$race == "10k",]
+```
+
+Los participantes (hombres) por categoría fueron:
+```{r echo=FALSE}
+print(with(df10k, table(event, Division)))
+```
+
+Los resultados:
+```{r echo=FALSE}
+with(df10k, tapply(Speed,event, summary))
+```
+
+Distribuidos por categoría (Division):
+
+```{r echo=FALSE,fig.height=9}
+pvio <- ggplot(df10k, aes(Division, Speed, fill=Sex)) +
+  coord_cartesian(ylim = c(3, 23)) + 
+  geom_violin() +
+  stat_summary(fun.y="mean", geom="point") +
+  geom_smooth(method = "lm", se=FALSE, color="black", aes(group=1)) +
+  facet_grid(event~.)
+pvio  
+```
+
+Y la regresión lineal por edad dá los siguientes resultados:
+```{r echo=FALSE}
+myLm10kMAgeMid <- function(sEvent) {
+	df <- df10k[df10k$Sex=="M",] 
+	lm(Speed ~ Age, data = df, subset=(event == sEvent))$coef
+}
+
+events <- levels(df10k$event)
+myLm <- sapply(events, myLm10kMAgeMid)
+options(digits=3)
+myLm
+```
+
+Estos resultados son consistentes con los de la carrera Brooks #50.
+Aunque en aquella no esta disponible la edad de cada participante y la regresión se hizo para la edad media de la categoría, y en el caso de MDS se hizo con la edad de cada participante.
+
+## Otra distancia
+
+Para chequear con otra distancia revisamos la media maratón de la MDS de los mismos años (2014,2015 y 2016).
+```{r echo=FALSE}
+df21k <- dfComplete[dfComplete$race == "21k",]
+```
+
+Los participantes (hombres) por categoría fueron:
+```{r echo=FALSE}
+print(with(df21k, table(event, Division)))
+```
+
+Los resultados:
+```{r echo=FALSE}
+with(df21k, tapply(Speed,event, summary))
+```
+
+Distribuidos por categoría (Division):
+
+```{r echo=FALSE,fig.height=9}
+pvio21k <- ggplot(df21k, aes(Division, Speed, fill=Sex)) +
+  coord_cartesian(ylim = c(3, 23)) + 
+  geom_violin() +
+  stat_summary(fun.y="mean", geom="point") +
+  geom_smooth(method = "lm", se=FALSE, color="black", aes(group=1)) +
+  facet_grid(event~.)
+pvio21k  
+```
+
+Y la regresión lineal por edad dá los siguientes resultados:
+```{r echo=FALSE}
+myLm21kMAge <- function(sEvent) {
+	df <- df21k[df21k$Sex=="M",] 
+	lm(Speed ~ Age, data = df, subset=(event == sEvent))$coef
+}
+
+events <- levels(dfComplete$event)
+lm21k <- sapply(events, myLm21kMAge)
+lm21k
+```
+
+Es llamativo que las velocidades medias son muy similares en las carreras de 10k y las de 21k.
+La baja de velocidad con la edad es menos significativa en las carreras de 21k que de 10k, casi la mitad.
+
+## Comentarios 
+Lo esperable era una baja en la velocidad con la edad. Y se dá en hombres en carreras de 10k y 21k. 
+
+En las mujeres ocurre algo distinto, con las categorías de 35 a 55 años teniendo los mejores resultados.
+Eso requiere una explicación.
+
+Por otra parte si observamos como cambian los máximos de cada categoría en los hombres, parece que la baja en la velocidad es mayor a la que indica la pendiente basada en la media.
+
+
+### Impresión
+Tengo la impresión de que la reducción de la velocidad con la edad es mayor que la que indica la regresión. Y que el efecto de auto selección efecto significativo. 
+Es decir, en las catagorías mayores solo quedan los runners más dedicados, lo que sube su promedio, mientras que en los más jovenes participan más corredores con poca dedicación, que bajan el promedio.
+Separar esa influencia requerirírá otro análisis.
+
+
+[Brooks50]: <http://metachip.cl/?op=4&evento=243>
+[mds2014]: <https://results.chronotrack.com/event/results/event/event-20591>
+[mds2015]: <https://results.chronotrack.com/event/results/event/event-13311>
+[mds2016]: <https://results.chronotrack.com/event/results/event/event-8069>
+
+

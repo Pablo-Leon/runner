@@ -2,16 +2,18 @@
 # Makefile
 #
 
-RMDFILE=runner1
+RMDFILE=by_division
 
-DATA_FILES=Brooks50.csv
+DATA_FILES=Brooks50.csv mds2014.csv mds2015.csv mds2016.csv
 
-SRCDATA_DIR=../../Data
+SRCDATA_DIR=../../../Data
 PUBLISH_DIR=../publish
 
 PERL_SOURCE_FILES=
+R_SOURCE_FILES=eda.R eda2.R
+
 SOURCE_FILES=Makefile $(PERL_SOURCE_FILES) \
-	eda1.R $(RMDFILE).Rmd 
+	$(R_SOURCE_FILES) $(RMDFILE).Rmd 
 
 .PHONY: all clean heads wdata chk bkp publish
 .SUFFIXES:.Rmd .html
@@ -47,10 +49,15 @@ chk:
 bkp:
 	bak.pl $(SOURCE_FILES) $(DATA_FILES)
 
+x: 
+	sed 's/\([^;]\)"\([^;]\)/\1~\2/' 	mds2016.csv > sal.txt
+	# sed 's/;Renato federico Sebastian Rojas Dall."Orso;/;Renato federico Sebastian Rojas Dall~Orso;/' 	mds2016.csv > sal.txt
+
 data: $(DATA_FILES)
 
-Brooks50.csv: $(SRCDATA_DIR)/$@
-	cp $(SRCDATA_DIR)/$@ .
+$(DATA_FILES): $(SRCDATA_DIR)/$@
+	# cp $(SRCDATA_DIR)/$@ .
+	sed 's/\([^;]\)"\([^;]\)/\1~\2/' $(SRCDATA_DIR)/$@ > $@
 
 browse:
 	google-chrome $(RMDFILE).html

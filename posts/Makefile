@@ -22,18 +22,23 @@ all: data $(RMDFILE).html
 hello:
 	echo "Hello!"
 
-publish: runner1.html
+publish: runner1.pdf
 	cp $^ $(PUBLISH_DIR)/.
+	git add $(PUBLISH_DIR)/$^
 
 .Rmd.html:	
 	Rscript -e "rmarkdown::render('$(RMDFILE).Rmd')"
 
+.Rmd.pdf:	
+	# pandoc +RTS -K64M -RTS -o $@  $<
+	Rscript -e "rmarkdown::render('$(RMDFILE).Rmd', pdf_document())"
+
 clean:
-	-rm *.trc 
+	-rm *.trc $(RMDFILE).html $(RMDFILE).pdf
 	-rm -r *_cache *_files
 
 clean-all: clean
-	rm $(DATA_FILES)
+	-rm $(DATA_FILES)
 
 chk:
 	clear
