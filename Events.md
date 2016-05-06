@@ -4,13 +4,13 @@ Events
 
 Brooks Vitacura
 -----------------
-	* web : http://www.brooks.cl/running/
-	* run.cl : http://run.cl/event/5068
-	* Strava Segment
-		* https://www.strava.com/segments/1325221
-		* https://www.strava.com/segments/search?utf8=%E2%9C%93&keywords=Brooks&gsf=1
-	* Race : 10k
-	* Distance : 9,860 metros
+* web : http://www.brooks.cl/running/
+* run.cl : http://run.cl/event/5068
+* Strava Segment
+  * https://www.strava.com/segments/1325221
+  * https://www.strava.com/segments/search?utf8=%E2%9C%93&keywords=Brooks&gsf=1
+* Race : 10k
+* Distance : 9,860 metros
 
 ### Instances
 | Name      | Description               | Date       | Temp(C) | Url
@@ -21,8 +21,8 @@ Brooks Vitacura
 
 MDS - Maratón de Santiago
 -------------------------
-	* Strava Segment : https://www.strava.com/segments/3777954
-		* 284 records
+* Strava Segment : https://www.strava.com/segments/3777954
+  * 284 records
 
 ### Instances
 | Name      | Description | Date       | Temp(C) | Url
@@ -34,11 +34,11 @@ MDS - Maratón de Santiago
 
 Berliner Halbmarathon
 ---------------------
-	* Web: http://www.berliner-halbmarathon.de/
-	* Course : http://www.berliner-halbmarathon.de/en/race-day/course.html
-	* Race : HalfMarathon
-	* Distance : ?
-	* Strava Segment : ?
+* Web: http://www.berliner-halbmarathon.de/
+* Course : http://www.berliner-halbmarathon.de/en/race-day/course.html
+* Race : HalfMarathon
+* Distance : ?
+* Strava Segment : ?
 
 ### Instances
 | Name         | Description | Date       | Temp(C) | Url
