@@ -6,7 +6,7 @@ RMDFILE=runner1
 
 DATA_FILES=Brooks50.csv
 
-SRCDATA_DIR=../../Data
+SRCDATA_DIR=../../../Data
 PUBLISH_DIR=../publish
 
 PERL_SOURCE_FILES=
@@ -14,15 +14,16 @@ SOURCE_FILES=Makefile $(PERL_SOURCE_FILES) \
 	eda1.R $(RMDFILE).Rmd 
 
 .PHONY: all clean heads wdata chk bkp publish
-.SUFFIXES:.Rmd .html
+.SUFFIXES:.Rmd .html .pdf
 
 
-all: data $(RMDFILE).html
+all: data $(RMDFILE).html 
 
 hello:
 	echo "Hello!"
 
-publish: runner1.pdf
+
+publish: $(RMDFILE).pdf
 	cp $^ $(PUBLISH_DIR)/.
 	git add $(PUBLISH_DIR)/$^
 
@@ -31,7 +32,7 @@ publish: runner1.pdf
 
 .Rmd.pdf:	
 	# pandoc +RTS -K64M -RTS -o $@  $<
-	Rscript -e "rmarkdown::render('$(RMDFILE).Rmd', pdf_document())"
+	Rscript -e "rmarkdown::render('$(RMDFILE).Rmd', rmarkdown::pdf_document())"
 
 clean:
 	-rm *.trc $(RMDFILE).html $(RMDFILE).pdf
