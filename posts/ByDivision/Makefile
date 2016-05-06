@@ -24,9 +24,10 @@ all: data $(RMDFILE).html
 hello:
 	echo "Hello!"
 
-# 	cp $^ $(PUBLISH_DIR)/.
-# 	git add $(PUBLISH_DIR)/$^
 publish: $(RMDFILE).pdf
+	cp $^ $(PUBLISH_DIR)/.
+	git add $(PUBLISH_DIR)/$^
+
 
 #	Rscript -e "rmarkdown::render('$(RMDFILE).Rmd', clean=FALSE)"
 .Rmd.html:	
