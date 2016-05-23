@@ -3,6 +3,7 @@ title: "Negative splits"
 output: html_document
 ---
 
+(sources and last version at [GitHub](https://github.com/Pablo-Leon/runner/tree/master/posts/neg_splits))
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
 library(dplyr)
@@ -55,7 +56,6 @@ LoadBerlHb <- function(y) {
 	df$Speed <- df$Dist / (df$NetMins/60)
 	return(df)
 }
-
 ```
 
 
@@ -63,10 +63,10 @@ This post is about negative splits. Which is a fancy way to say that you start r
 
 The splits strategy is somewhat disputed, but many coaches recommend using negative splits (look [here](http://www.runnersworld.com/race-training/learn-how-to-run-negative-splits)). 
 
-The question of this post is whether negatiive or positive splits running has any relation with the results.
+The question of this post is whether negative or positive splits running has any relation with the results.
 
 ### The race(s)
-This time I had to change the races used. The thing with the races in Santiago is that they must have uphill and downhill segments, which could affect the results. So I went for a flat race, and flat Berlin flat is. So the chosen race was the [Belrlin Halb Marathon](http://www.berliner-halbmarathon.de/en/).   
+This time I had to change the races used. The thing with the races in Santiago is that they must have uphill and downhill segments, which could affect the results. So I went for a flat race, and flat Berlin is. So the chosen race was the [Belrlin Halb Marathon](http://www.berliner-halbmarathon.de/en/).   
 
 The specific races where from years 2011, 2013 and 2015 (see the results [site](http://www.berliner-halbmarathon.de/en/race-day/results-archive.html)).
 
@@ -102,7 +102,7 @@ with(df,tapply(complete, event, summary))
 ```
 
 ### The splits
-The races results contains partial times for the first 10 km, which allows to calculate the average for the two segments. Splits are negative if the speed on the second segment is faster than the first. Two attributes were added to the data, *dsign*, which is -1 (for negative splits), 0 or +1. And *delta_pct* which is the percentual change of speed.
+The races results contains partial times for the first 10 km, which allows to calculate the average for the two segments. Splits are negative if the speed on the second segment is faster than the first. Two attributes were added to the data, *dsign*, which is -1 (for negative splits), 0 or +1. And  *delta_pct* which is the  change of speed expressed in percent.
 
 This is how the sign of the splits is distributed:
 ```{r echo=FALSE}
@@ -111,7 +111,7 @@ nPctNeg <- sprintf("%0.2f", sum(df$dsign == -1)/length(df[,1])*100)
 ```
 And the total percentage of negative splits is **`r nPctNeg`%**.
 
-The percentual change in speed (delta_pct) range is (overall):
+The change in speed (delta_pct) range is (overall):
 ```{r echo=FALSE}
 with(df,summary(delta_pct))
 ```
@@ -133,7 +133,7 @@ pdelta
 
 2011 race looks different than the other two years in shape and center, for reasons unknown to me.
 
-Most people runs positive splits, ranging from 0% to arround 8% slower in the second half.
+Most people runs positive splits, ranging from 0% to around 8% slower in the second half.
 
 ### Splits and speed
 
@@ -147,7 +147,7 @@ pDeltaSpeed <- ggplot(df, aes(delta_pct, complete, color=Sex)) +
 pDeltaSpeed
 ```
 
-From this charts its clear that theres is a relation between the speed difference and the total speed. Those with lower splits tend to run faster. But at the same time splits don't seem to explain the best times, fastest runners tend to have small splits, around cero.
+From this charts its clear that there is a relation between the speed difference and the total speed. Those with lower splits tend to run faster. But at the same time splits don't seem to explain the best times, fastest runners tend to have small splits, around zero.
 
 Let's do the numbers, comparing negative splits speeds with no-negative, for women:
 ```{r echo=FALSE}
@@ -172,7 +172,7 @@ That was using just a negative/non-negative attribute. What about the size in sp
 
 ### Relation with other factors
 
-Let's compare with Sex:
+Let's compare with **Sex**:
 ```{r echo=FALSE}
 pSexDelta <- ggplot(df, aes(Sex, delta_pct, color=Sex)) +
   coord_cartesian(ylim = c(-2, +12)) +
@@ -182,9 +182,9 @@ vW <- df[ df$Sex == 'W', "delta_pct"]
 t.test(vM, vW)
 ```
 
-So it doesn't seem to be an association between Sex and the speed change.
+So it doesn't seem to be an association between **Sex** and the speed change.
 
-Then the relation with Age:
+Then the relation with **Age**:
 
 ```{r echo=FALSE}
 pAgeDelta <- ggplot(df, aes(Age, delta_pct, color=Sex)) +
@@ -272,13 +272,13 @@ And if we test for difference between negative and no-negative splits:
 ttstMf <- split.t.test(dfMf)
 ttstMf
 ```
-We find the in this group the split sign still have a significat association with the speed, being positive splits slower (with a p-value of **`r sprintf("%0.3f", ttstMf$p.value)`**).
+We find the in this group the split sign still have a significant association with the speed, being positive splits slower (with a p-value of **`r sprintf("%0.3f", ttstMf$p.value)`**).
 
 
 ### Conclusion
 
 Negative splits are a good thing for running. But as most good thins should not be overdone. Best results are associated with just a slight improvement of speed on second half. 
 
-One notable thing is that having negative, or lower splits, have a stronger association with the overall speed than age. Meaning that much of the age disadvantage can be neutrilized with pace management.
+One notable thing is that having negative, or lower splits, have a stronger association with the overall speed than age. Meaning that much of the age disadvantage can be neutralized with pace management.
 
 regards
